@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cyber-dashboard
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - OPENSEARCH_URL=${OPENSEARCH_URL:-https://host.docker.internal:9200}
+      - OPENSEARCH_USERNAME=${OPENSEARCH_USERNAME:-admin}
+      - OPENSEARCH_PASSWORD=${OPENSEARCH_PASSWORD:-admin}
+      - OPENSEARCH_SSL_CA=${OPENSEARCH_SSL_CA:-}
+      - OPENSEARCH_SSL_REJECT_UNAUTHORIZED=false
+      - WAZUH_INDEX_PATTERN=${WAZUH_INDEX_PATTERN:-wazuh-alerts-*}
+      - ALERT_POLLING_INTERVAL=5000
+      - USE_MOCK_DATA=false
+      - ENABLE_WEBHOOK=true
+      - MIN_ALERT_LEVEL=1
+      - MAX_ALERTS_PER_BATCH=100
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+networks:
+  default:
+    name: cyber-dashboard-network
